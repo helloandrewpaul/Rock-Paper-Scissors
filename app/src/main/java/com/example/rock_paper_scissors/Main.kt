@@ -3,6 +3,27 @@ package com.example.rock_paper_scissors
 fun main() {
     val choices = listOf("Rock", "Paper", "Scissors", "Lizard", "Spock")
 
+    val rules = mapOf(
+        "Rock" to listOf("Scissors" to "Rock crushes Scissors", "Lizard" to "Rock crushes Lizard"),
+        "Paper" to listOf("Rock" to "Paper covers Rock", "Spock" to "Paper disproves Spock"),
+        "Scissors" to listOf("Paper" to "Scissors cuts Paper", "Lizard" to "Scissors decapitates Lizard"),
+        "Lizard" to listOf("Spock" to "Lizard poisons Spock", "Paper" to "Lizard eats Paper"),
+        "Spock" to listOf("Scissors" to "Spock smashes Scissors", "Rock" to "Spock vaporizes Rock")
+    )
+
+    fun getWinningMessage(winner: String): String {
+        return if (winner == "Player") "Player is the winner!" else "Computer is the winner!"
+    }
+
+    fun checkWinner(playerChoice: String, computerChoice: String): String {
+        return when {
+            playerChoice == computerChoice -> "Tie"
+            rules[playerChoice]?.any { it.first == computerChoice } == true -> "Player"
+            rules[computerChoice]?.any { it.first == playerChoice } == true -> "Computer"
+            else -> "Computer"
+        }
+    }
+
     do {
         var playerChoice: String
 
@@ -24,24 +45,24 @@ fun main() {
         println("\nYou chose: $playerChoice")
         println("Computer chose: $computerChoice")
 
-        val winner = when {
-            playerChoice == computerChoice -> "Tie"
-            playerChoice == "Rock" && (computerChoice == "Scissors" || computerChoice == "Lizard") -> "Player"
-            playerChoice == "Paper" && (computerChoice == "Rock" || computerChoice == "Spock") -> "Player"
-            playerChoice == "Scissors" && (computerChoice == "Paper" || computerChoice == "Lizard") -> "Player"
-            playerChoice == "Lizard" && (computerChoice == "Spock" || computerChoice == "Paper") -> "Player"
-            playerChoice == "Spock" && (computerChoice == "Scissors" || computerChoice == "Rock") -> "Player"
-            else -> "Computer"
+        val winner = checkWinner(playerChoice, computerChoice)
+
+        if (winner != "Tie") {
+            val defeatMessage = rules[playerChoice]?.firstOrNull { it.first == computerChoice }?.second
+                ?: rules[computerChoice]?.firstOrNull { it.first == playerChoice }?.second
+                ?: "No special message"
+            println(defeatMessage)
         }
 
-        println(if (winner == "Tie") "It's a tie!" else "$winner is the winner!")
+        val resultMessage = if (winner == "Tie") "It's a tie!" else getWinningMessage(winner)
+
+        println(resultMessage)
 
         var playAgain: String
         while (true) {
             println("\nWould you like to play again? (y/n)")
             playAgain = readln().trim().lowercase()
 
-            // Check for valid play again input
             if (playAgain in listOf("y", "n")) break
             println("Enter a valid selection (y or n)!")
         }
@@ -50,4 +71,7 @@ fun main() {
 
     println("Goodbye! Thanks for playing.")
 }
+
+
+
 
